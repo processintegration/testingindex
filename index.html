@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AskPI AI PDF QA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2em;
+      background: #f9f9f9;
+    }
+    #container {
+      max-width: 600px;
+      margin: auto;
+      padding: 1em;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    input, button {
+      width: 100%;
+      padding: 1em;
+      margin-top: 1em;
+      font-size: 1em;
+    }
+    #answer {
+      margin-top: 1em;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h2>Ask Your PDF</h2>
+    <input type="text" id="question" placeholder="Enter your question..." />
+    <button onclick="askQuestion()">Ask</button>
+    <p id="loading" style="display: none;">Answer loading...</p>
+    <div id="answer"></div>
+  </div>
+
+  <script>
+    async function askQuestion() {
+      const question = document.getElementById("question").value;
+      const answerDiv = document.getElementById("answer");
+      const loading = document.getElementById("loading");
+      answerDiv.innerText = "";
+      loading.style.display = "block";
+
+      try {
+        const response = await fetch("https://askpi-backend.onrender.com/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ question })
+        });
+
+        const data = await response.json();
+        if (data.answer) {
+          answerDiv.innerText = data.answer;
+        } else {
+          answerDiv.innerText = data.error || "No answer returned.";
+        }
+      } catch (error) {
+        answerDiv.innerText = "Error contacting backend: " + error;
+      }
+
+      loading.style.display = "none";
+    }
+  </script>
+</body>
+</html>
