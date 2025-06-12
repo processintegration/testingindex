@@ -27,14 +27,11 @@
     #answer {
       margin-top: 1em;
       white-space: pre-wrap;
-      background: #f0f0f0;
-      padding: 1em;
-      border-radius: 8px;
-      min-height: 60px;
     }
     #loading {
       margin-top: 1em;
-      color: #007bff;
+      color: #007BFF;
+      font-style: italic;
     }
   </style>
 </head>
@@ -43,7 +40,7 @@
     <h2>Ask Your PDF</h2>
     <input type="text" id="question" placeholder="Enter your question..." />
     <button onclick="askQuestion()">Ask</button>
-    <p id="loading" style="display: none;">⏳ Answer loading...</p>
+    <p id="loading" style="display: none;">Answer loading...</p>
     <div id="answer"></div>
   </div>
 
@@ -52,14 +49,14 @@
       const question = document.getElementById("question").value.trim();
       const answerDiv = document.getElementById("answer");
       const loading = document.getElementById("loading");
-      answerDiv.innerText = "";
-      loading.style.display = "block";
 
       if (!question) {
         answerDiv.innerText = "❗ Please enter a question.";
-        loading.style.display = "none";
         return;
       }
+
+      answerDiv.innerText = "";
+      loading.style.display = "block";
 
       try {
         const response = await fetch("https://askpi-backend.onrender.com/ask", {
@@ -71,19 +68,14 @@
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Server error: ${response.status} - ${errorText}`);
+          const errText = await response.text();
+          throw new Error(errText || "Failed to get response.");
         }
 
         const data = await response.json();
-
-        if (data.answer) {
-          answerDiv.innerText = data.answer;
-        } else {
-          answerDiv.innerText = data.error || "⚠️ No answer returned.";
-        }
+        answerDiv.innerText = data.answer || data.error || "No answer returned.";
       } catch (error) {
-        answerDiv.innerText = "❌ Error contacting backend: " + error.message;
+        answerDiv.innerText = "⚠️ Error contacting backend: " + error.message;
       }
 
       loading.style.display = "none";
